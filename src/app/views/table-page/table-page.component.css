@@ -4,7 +4,8 @@
 
 .container .filter-container {
     display: flex;
-    justify-content: end;       
+    justify-content: end;
+    gap: 20px    
 }
 
 .additional-selection {

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { forkJoin, map, Observable, switchMap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { PokemonListDto } from '../dtos/pokemon-list-dto';
+import { ListDto } from '../dtos/list-dto';
 import { PokemonDto } from '../dtos/pokemon-dto';
 import { Pokemon } from '../models/pokemon.model';
 import { PaginatorModel } from '../models/paginator.model';
@@ -9,7 +9,7 @@ import { PaginatorModel } from '../models/paginator.model';
 @Injectable()
 export class PokemonService {
 
-  private readonly apiBaseUrl: string = "https://pokeapi.co/api/v2/pokemon/";
+  private readonly apiBaseUrl: string = "https://pokeapi.co/api/v2/";
   private _paginatorObj: PaginatorModel = { count: 0, next: "", previous: "" };
 
   constructor(
@@ -20,7 +20,7 @@ export class PokemonService {
     return this._paginatorObj;
   }
 
-  private set paginatorObj(obj: PokemonListDto) {
+  private set paginatorObj(obj: ListDto) {
     this._paginatorObj = {
       count: obj.count,
       next: obj.next,
@@ -49,13 +49,13 @@ export class PokemonService {
     return pokemonModel;
   }
 
-  private getPokemonSource(url: string): Observable<PokemonListDto> {
-    return this.httpClient.get<PokemonListDto>(`${url}`);
+  private getPokemonSource(url: string): Observable<ListDto> {
+    return this.httpClient.get<ListDto>(`${url}`);
   }
 
-  public getPokemonList(url: string = this.apiBaseUrl): Observable<Pokemon[]> {
+  public getPokemonList(url: string = this.apiBaseUrl + "pokemon/"): Observable<Pokemon[]> {
     return this.getPokemonSource(url).pipe(
-      map((response: PokemonListDto) => {
+      map((response: ListDto) => {
         this.paginatorObj = response;
         const urls = response.results.map((result) => result.url);
         const detailCalls: Observable<PokemonDto>[] = urls.map((url) => this.httpClient.get<PokemonDto>(url));
@@ -63,9 +63,14 @@ export class PokemonService {
       }),
       switchMap((response) => response),
       map((pokemonDtos: PokemonDto[]) => {
-        console.log(pokemonDtos);
         return pokemonDtos.map((pokemonDto) => this.DtoToModel(pokemonDto))
       })
+    );
+  }
+
+  public getTypeList(): Observable<string[]> {
+    return this.httpClient.get<ListDto>(this.apiBaseUrl + "type/?limit=21").pipe(
+      map((response: ListDto) => response.results.map((type) => type.name))
     );
   }
 }

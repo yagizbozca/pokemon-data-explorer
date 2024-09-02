@@ -3,7 +3,7 @@
     <div class="filter-container">
 
         <mat-form-field>
-            <mat-label>Toppings</mat-label>
+            <mat-label>Types</mat-label>
             <mat-select (selectionChange)="filterByTypeHandler($event)" multiple>
               <mat-select-trigger>
                 {{filterByTypeValue[0] || ''}}
@@ -51,7 +51,7 @@
             </ng-container>
     
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="rowClickHandler(row)"></tr>
     
         </table>
 
