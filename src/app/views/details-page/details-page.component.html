@@ -1,1 +1,16 @@
-<p>details-page works!</p>
+<div class="container">
+    <div class="back-to-list-btn">
+        <button mat-stroked-button>Back to list</button>
+    </div>
+    <div class="content-container">
+        <div class="image-container">
+            <img [src]="pokemon?.image" alt="Pokemon image">
+        </div>
+        <div class="info-container">
+            Info
+        </div>
+    </div>
+    
+</div>
+
+{{pokemon | json}}

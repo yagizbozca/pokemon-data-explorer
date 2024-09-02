@@ -3,6 +3,7 @@ import { PokemonService } from '../../core/services/pokemon.service';
 import { Pokemon } from '../../core/models/pokemon.model';
 import { PageEvent } from '@angular/material/paginator';
 import { MatSelectChange } from '@angular/material/select';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-table-page',
@@ -14,22 +15,22 @@ export class TablePageComponent implements OnInit {
 
     protected readonly displayedColumns: string[] = ['id', 'name', 'types', 'sprite'];
     protected dataSource: Pokemon[] = [];
-    protected pokemonList: Pokemon[] = [];
     protected typeList: string[] = [];
     protected filterByTypeValue: string[] = [];
 
     constructor(
-        protected pokemonService: PokemonService
+        protected pokemonService: PokemonService,
+        protected router: Router
     ) {}
 
     private getPokemonList(url?: string): void {
         this.pokemonService.getPokemonList(url).subscribe({
             next: (pokemonList: Pokemon[]) => {
-                this.pokemonList = pokemonList;
                 this.dataSource = pokemonList;
 
                 this.applyFilter(this.filterByNameValue, this.filterByTypeValue);
-            }
+            },
+            error: (err) => console.error(err)
         });
     }
 
@@ -37,17 +38,18 @@ export class TablePageComponent implements OnInit {
         this.pokemonService.getTypeList().subscribe({
             next: (typeList: string[]) => {
                 this.typeList = typeList;
-            }
+            },
+            error: (err) => console.error(err)
         });
     }
 
     private applyFilter(nameFilterValue: string, typeFilterValue: string[]): void {
         if (!(nameFilterValue.length || typeFilterValue.length)) {
-            this.dataSource = this.pokemonList;
+            this.dataSource = this.pokemonService.pokemonList;
             return;
         }
 
-        this.dataSource = this.pokemonList.filter((item) => {
+        this.dataSource = this.pokemonService.pokemonList.filter((item) => {
             // If 'typeFilterValue' is an empty array, right side of the logic always returns true as considered there is no filter applied.
             return item.name.toLowerCase().includes(nameFilterValue) && (!typeFilterValue.length || typeFilterValue.some((type) => item.types.includes(type)))
         });
@@ -74,8 +76,8 @@ export class TablePageComponent implements OnInit {
         this.applyFilter(this.filterByNameValue, this.filterByTypeValue);
     }
 
-    protected rowClickHandler(e: Pokemon) {
-        console.log(e);
+    protected rowClickHandler(id: number) {
+        this.router.navigate(["detail", id]);
     }
 
     ngOnInit(): void {
