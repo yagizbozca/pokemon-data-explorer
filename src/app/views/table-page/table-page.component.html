@@ -1,5 +1,31 @@
 <div class="container">
 
+    <div class="filter-container">
+
+        <mat-form-field>
+            <mat-label>Toppings</mat-label>
+            <mat-select (selectionChange)="filterByTypeHandler($event)" multiple>
+              <mat-select-trigger>
+                {{filterByTypeValue[0] || ''}}
+                @if ((filterByTypeValue.length || 0) > 1) {
+                  <span class="additional-selection">
+                    (+{{(filterByTypeValue.length || 0) - 1}} {{filterByTypeValue.length === 2 ? 'other' : 'others'}})
+                  </span>
+                }
+              </mat-select-trigger>
+              @for (type of typeList; track type) {
+            <mat-option [value]="type">{{type}}</mat-option>
+          }
+            </mat-select>
+          </mat-form-field>
+
+        <mat-form-field>
+            <mat-label>Search</mat-label>
+            <input matInput (keyup)="filterByNameEventHandler($event)" placeholder="Search by name">
+        </mat-form-field>
+
+    </div>
+
     <div class="table-container">
 
         <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
@@ -30,8 +56,14 @@
         </table>
 
     </div>
-    @if (paginatorObj && paginatorObj.count > 20) {
-        <mat-paginator [length]="paginatorObj.count" [pageSize]="20" aria-label="Select page of pokemon search results"></mat-paginator>
+    @if (pokemonService.paginatorObj && pokemonService.paginatorObj.count > 20) {
+        <mat-paginator 
+            class="mat-elevation-z8"
+            (page)="pageEventHandler($event)"
+            [length]="pokemonService.paginatorObj.count"
+            [pageSize]="20" 
+            aria-label="Select page of pokemon search results"
+        ></mat-paginator>
     }
 
 </div>
