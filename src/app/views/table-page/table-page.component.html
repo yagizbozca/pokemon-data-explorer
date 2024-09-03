@@ -3,19 +3,20 @@
         <mat-form-field>
             <mat-label>Types</mat-label>
             <mat-select (selectionChange)="filterByTypeHandler($event)" multiple>
-              <mat-select-trigger>
-                {{filterByTypeValue[0] || ''}}
-                @if ((filterByTypeValue.length || 0) > 1) {
-                  <span class="additional-selection">
-                    (+{{(filterByTypeValue.length || 0) - 1}} {{filterByTypeValue.length === 2 ? 'other' : 'others'}})
-                  </span>
+                <mat-select-trigger>
+                    {{filterByTypeValue[0] || ''}}
+                    @if ((filterByTypeValue.length || 0) > 1) {
+                    <span class="additional-selection">
+                        (+{{(filterByTypeValue.length || 0) - 1}} {{filterByTypeValue.length === 2 ? 'other' :
+                        'others'}})
+                    </span>
+                    }
+                </mat-select-trigger>
+                @for (type of typeList; track type) {
+                <mat-option [value]="type">{{type}}</mat-option>
                 }
-              </mat-select-trigger>
-              @for (type of typeList; track type) {
-            <mat-option [value]="type">{{type}}</mat-option>
-          }
             </mat-select>
-          </mat-form-field>
+        </mat-form-field>
 
         <mat-form-field>
             <mat-label>Search</mat-label>
@@ -23,39 +24,33 @@
         </mat-form-field>
     </div>
 
-    <div class="table-container">
-        <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
-            <ng-container matColumnDef="id">
-                <th mat-header-cell *matHeaderCellDef> id </th>
-                <td mat-cell *matCellDef="let pokemon"> {{pokemon.id}} </td>
-            </ng-container>
-    
-            <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef> name </th>
-                <td mat-cell *matCellDef="let pokemon"> {{pokemon.name}} </td>
-            </ng-container>
-    
-            <ng-container matColumnDef="types">
-                <th mat-header-cell *matHeaderCellDef> type(s) </th>
-                <td mat-cell *matCellDef="let pokemon"> {{pokemon.types}} </td>
-            </ng-container>
-    
-            <ng-container matColumnDef="sprite">
-                <th mat-header-cell *matHeaderCellDef> sprite </th>
-                <td mat-cell *matCellDef="let pokemon"> <img [src]="pokemon.image" /> </td>
-            </ng-container>
-    
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="rowClickHandler(row.id)"></tr>
-        </table>
-    </div>
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+        <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef> id </th>
+            <td mat-cell *matCellDef="let pokemon"> {{pokemon.id}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef> name </th>
+            <td mat-cell *matCellDef="let pokemon"> {{pokemon.name}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="types">
+            <th mat-header-cell *matHeaderCellDef> type(s) </th>
+            <td mat-cell *matCellDef="let pokemon"> {{pokemon.types}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="sprite">
+            <th mat-header-cell *matHeaderCellDef> sprite </th>
+            <td mat-cell *matCellDef="let pokemon"> <img [src]="pokemon.image" /> </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="rowClickHandler(row.id)"></tr>
+    </table>
     @if (pokemonService.paginatorObj && pokemonService.paginatorObj.count > 20) {
-        <mat-paginator 
-            class="mat-elevation-z8"
-            (page)="pageEventHandler($event)"
-            [length]="pokemonService.paginatorObj.count"
-            [pageSize]="20" 
-            aria-label="Select page of pokemon search results"
-        ></mat-paginator>
+    <mat-paginator class="mat-elevation-z8" (page)="pageEventHandler($event)"
+        [length]="pokemonService.paginatorObj.count" [pageSize]="20"
+        aria-label="Select page of pokemon search results"></mat-paginator>
     }
 </div>

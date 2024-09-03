@@ -1,33 +1,37 @@
 @if (pokemon$ | async) {
-    <div class="container">
-        <button mat-stroked-button (click)="backBtnClickHandler()">Back to list</button>
-        <div class="content-container">
+<div class="container">
+    <button mat-stroked-button (click)="backBtnClickHandler()">Back to list</button>
+    <div class="content-container">
+        <div>
             <img [src]="pokemon?.image" alt="Pokemon image">
-            <div class="info-container">
-                <p>id: {{ pokemon?.id }}</p>
-                <p>name: {{ pokemon?.name }}</p>
-                <p>types: {{ pokemon?.types }}</p>
-                <div>
-                    <p>stats:</p>
-                    <ul>
-                        @for (stat of pokemon?.stats; track stat.name) {
-                            <li>name: {{ stat.name }}</li>
-                            <li>base: {{ stat.base }}</li>
-                            <li>effort: {{ stat.effort }}</li>
-                        }
-                    </ul>
-                </div>
-                <div>
-                    <p>abilities:</p>
-                    <ul>
-                        @for (ability of pokemon?.abilities; track ability.name) {
-                            <li>name: {{ ability.name }}</li>
-                            <li>hidden: {{ ability.isHidden }}</li>
-                            <li>slot number: {{ ability.slotNumber }}</li>
-                        }
-                    </ul>
-                </div>
+        </div>
+        <div class="info-container">
+            <p>id: {{ pokemon?.id }}</p>
+            <p>name: {{ pokemon?.name }}</p>
+            <p>types: {{ pokemon?.types }}</p>
+            <div>
+                <p>stats:</p>
+                <ul>
+                    @for (stat of pokemon?.stats; track stat.name) {
+                    <li>name: {{ stat.name }}</li>
+                    <li>base: {{ stat.base }}</li>
+                    <li>effort: {{ stat.effort }}</li>
+                    <br>
+                    }
+                </ul>
+            </div>
+            <div>
+                <p>abilities:</p>
+                <ul>
+                    @for (ability of pokemon?.abilities; track ability.name) {
+                    <li>name: {{ ability.name }}</li>
+                    <li>hidden: {{ ability.isHidden }}</li>
+                    <li>slot number: {{ ability.slotNumber }}</li>
+                    <br>
+                    }
+                </ul>
             </div>
         </div>
     </div>
+</div>
 }

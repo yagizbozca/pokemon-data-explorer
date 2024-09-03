@@ -30,7 +30,9 @@ export class TablePageComponent implements OnInit {
 
                 this.applyFilter(this.filterByNameValue, this.filterByTypeValue);
             },
-            error: (err) => console.error(err)
+            error: (error) => {
+                throw error;
+            }
         });
     }
 
@@ -39,7 +41,9 @@ export class TablePageComponent implements OnInit {
             next: (typeList: string[]) => {
                 this.typeList = typeList;
             },
-            error: (err) => console.error(err)
+            error: (error) => {
+                throw error;
+            }
         });
     }
 

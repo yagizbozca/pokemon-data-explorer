@@ -1,9 +1,10 @@
-import { NgModule } from '@angular/core';
+import { ErrorHandler, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ViewsModule } from './views/views.module';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { GlobalErrorHandlerService } from './core/errors/global-error-handler.service';
 
 
 @NgModule({
@@ -16,7 +17,11 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
     ViewsModule
   ],
   providers: [
-    provideAnimationsAsync()
+    provideAnimationsAsync(),
+    {
+      provide: ErrorHandler,
+      useClass: GlobalErrorHandlerService,
+    }
   ],
   bootstrap: [AppComponent]
 })

@@ -28,8 +28,8 @@ export class DetailsPageComponent {
                 this.pokemon = pokemon;
                 return pokemon;
             }),
-            catchError(() => {
-                throw new Error("No pokemon found");
+            catchError((error) => {
+                throw error;
             })
         );
     }

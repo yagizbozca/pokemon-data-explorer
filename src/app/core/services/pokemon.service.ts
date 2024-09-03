@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { catchError, forkJoin, map, Observable, of, retry, switchMap } from 'rxjs';
+import { catchError, forkJoin, map, Observable, retry, switchMap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { ListDto } from '../dtos/list-dto';
 import { PokemonDto } from '../dtos/pokemon-dto';
