@@ -11,3 +11,7 @@
     gap: 40px;
 }
 
+button {
+    width: max-content;
+}
+
