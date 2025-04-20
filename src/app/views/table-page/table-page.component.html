@@ -42,7 +42,7 @@
 
         <ng-container matColumnDef="sprite">
             <th mat-header-cell *matHeaderCellDef> sprite </th>
-            <td mat-cell *matCellDef="let pokemon"> <img [src]="pokemon.image" /> </td>
+            <td mat-cell *matCellDef="let pokemon"> <img [ngSrc]="pokemon.image" priority width="96" height="96" alt="pokemon picture" /> </td>
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

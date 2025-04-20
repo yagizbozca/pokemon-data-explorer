@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {CommonModule, NgOptimizedImage} from '@angular/common';
 import { TablePageComponent } from './table-page/table-page.component';
 import { DetailsPageComponent } from './details-page/details-page.component';
 import { HttpClientModule } from '@angular/common/http';
@@ -26,7 +26,8 @@ import { MatButtonModule } from '@angular/material/button';
     MatTableModule,
     MatPaginatorModule,
     MatButtonModule,
-    RouterModule
+    RouterModule,
+    NgOptimizedImage
   ]
 })
 export class ViewsModule { }

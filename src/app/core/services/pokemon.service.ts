@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { catchError, forkJoin, map, Observable, retry, switchMap } from 'rxjs';
+import {catchError, delay, forkJoin, from, map, merge, mergeMap, Observable, of, retry, switchMap} from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { ListDto } from '../dtos/list-dto';
 import { PokemonDto } from '../dtos/pokemon-dto';
 import { Pokemon } from '../models/pokemon.model';
 import { PaginatorModel } from '../models/paginator.model';
+import {PokemonErrorModel} from "../models/pokemon-error.model";
 
 @Injectable({
     providedIn: "root"
@@ -14,17 +15,17 @@ export class PokemonService {
     private readonly apiBaseUrl: string = "https://pokeapi.co/api/v2/";
     private readonly retryNumber: number = 3;
     private _paginatorObj: PaginatorModel = { count: 0, next: "", previous: "" };
-    private _pokemonList: Pokemon[] = [];
+    private _pokemonList: Array<Pokemon | PokemonErrorModel> = [];
 
     constructor(
         private httpClient: HttpClient
     ) { }
 
-    public get paginatorObj(): PaginatorModel {
+    get paginatorObj(): PaginatorModel {
         return this._paginatorObj;
     }
 
-    private set paginatorObj(obj: ListDto) {
+    set paginatorObj(obj: ListDto) {
         this._paginatorObj = {
             count: obj.count,
             next: obj.next,
@@ -32,12 +33,15 @@ export class PokemonService {
         };
     }
 
-    public get pokemonList(): Pokemon[] {
+    get pokemonList(): Array<Pokemon | PokemonErrorModel> {
         return this._pokemonList;
     }
 
-    private set pokemonList(list: Pokemon[]) {
-        this._pokemonList = list;
+    set pokemonList(pokemon: Pokemon | PokemonErrorModel ) {
+        if (!pokemon) {
+            this._pokemonList = [];
+        }
+        this._pokemonList.push(pokemon);
     }
 
     private DtoToModel(dto: PokemonDto): Pokemon {
@@ -49,7 +53,7 @@ export class PokemonService {
         const stats: { name: string, base: number, effort: number }[] = dto.stats.map(
             (stat) => ({ name: stat.stat.name, base: stat.base_stat, effort: stat.effort }));
 
-        const pokemonModel: Pokemon = {
+        return {
             id: dto.id,
             name: dto.name,
             types: types,
@@ -57,8 +61,6 @@ export class PokemonService {
             abilities: abilities,
             stats: stats
         };
-
-        return pokemonModel;
     }
 
     private getPokemonSource(url: string): Observable<ListDto> {
@@ -70,22 +72,20 @@ export class PokemonService {
         );
     }
 
-    public getPokemonList(url: string = this.apiBaseUrl + "pokemon/"): Observable<Pokemon[]> {
+    public getPokemonList(url: string = this.apiBaseUrl + "pokemon/") {
         return this.getPokemonSource(url).pipe(
-            map((response: ListDto) => {
+            switchMap((response) => {
                 this.paginatorObj = response;
                 const urls = response.results.map((result) => result.url);
-                const detailCalls: Observable<PokemonDto>[] = urls.map((url) => this.httpClient.get<PokemonDto>(url));
-                return forkJoin(detailCalls);
+                return from(urls);
             }),
-            switchMap((response) => response),
-            map((pokemonDtos: PokemonDto[]) => {
-                this.pokemonList = pokemonDtos.map((pokemonDto) => this.DtoToModel(pokemonDto));
-                return this.pokemonList;
-            }),
-            retry(this.retryNumber),
-            catchError((error) => {
-                throw error;
+            mergeMap((url) => {
+                return this.httpClient.get<PokemonDto>(url).pipe(
+                    delay((new Date().getMilliseconds() % 7)*1000), // To simulate network latency
+                    map(pokemonDto => this.DtoToModel(pokemonDto)),
+                    retry(this.retryNumber),
+                    catchError(() => of<PokemonErrorModel>({ errorMessage: 'An error occurred', failed: true }))
+                );
             })
         );
     }

@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { PokemonService } from '../../core/services/pokemon.service';
-import { Pokemon } from '../../core/models/pokemon.model';
 import { PageEvent } from '@angular/material/paginator';
 import { MatSelectChange } from '@angular/material/select';
 import { Router } from '@angular/router';
+import { PokemonErrorModel } from "../../core/models/pokemon-error.model";
+import {Pokemon} from "../../core/models/pokemon.model";
 
 @Component({
     selector: 'app-table-page',
@@ -14,7 +15,7 @@ export class TablePageComponent implements OnInit {
     private filterByNameValue: string = "";
 
     protected readonly displayedColumns: string[] = ['id', 'name', 'types', 'sprite'];
-    protected dataSource: Pokemon[] = [];
+    protected dataSource: Array<Pokemon | PokemonErrorModel> = [];
     protected typeList: string[] = [];
     protected filterByTypeValue: string[] = [];
 
@@ -25,10 +26,13 @@ export class TablePageComponent implements OnInit {
 
     private getPokemonList(url?: string): void {
         this.pokemonService.getPokemonList(url).subscribe({
-            next: (pokemonList: Pokemon[]) => {
-                this.dataSource = pokemonList;
-
-                this.applyFilter(this.filterByNameValue, this.filterByTypeValue);
+            next: (pokemon) => {
+                this.dataSource = [...this.dataSource, pokemon]
+                    .sort((a, b) => (<Pokemon>a).id - (<Pokemon>b).id);
+                this.pokemonService.pokemonList = pokemon;
+                if (this.filterByNameValue.length || this.filterByTypeValue.length) {
+                    this.applyFilter(this.filterByNameValue, this.filterByTypeValue);
+                }
             },
             error: (error) => {
                 throw error;
@@ -48,16 +52,16 @@ export class TablePageComponent implements OnInit {
     }
 
     private applyFilter(nameFilterValue: string, typeFilterValue: string[]): void {
-        if (!(nameFilterValue.length || typeFilterValue.length)) {
-            this.dataSource = this.pokemonService.pokemonList;
-            return;
-        }
-
-        this.dataSource = this.pokemonService.pokemonList.filter((item) => {
-            // If 'typeFilterValue' is an empty array, right side of the logic always returns true as considered there is no filter applied.
-            return item.name.toLowerCase().includes(nameFilterValue) && (!typeFilterValue.length || typeFilterValue.some((type) => item.types.includes(type)))
-        });
-
+        this.dataSource = this.pokemonService.pokemonList
+            .filter((item) => {
+                if (item.hasOwnProperty('name') && item.hasOwnProperty('types')) {
+                    // If 'typeFilterValue' is an empty array, right side of the logic always returns true as considered there is no filter applied.
+                    return (<Pokemon>item).name.toLowerCase().includes(nameFilterValue) && (!typeFilterValue.length || typeFilterValue.some((type) => (<Pokemon>item).types.includes(type)))
+                } else {
+                    return false;
+                }
+            })
+            .sort((a, b) => (<Pokemon>a).id - (<Pokemon>b).id);
     }
 
     protected pageEventHandler(e: PageEvent): void {
@@ -81,7 +85,7 @@ export class TablePageComponent implements OnInit {
     }
 
     protected rowClickHandler(id: number) {
-        this.router.navigate(["detail", id]);
+        void this.router.navigate(["detail", id]);
     }
 
     ngOnInit(): void {
