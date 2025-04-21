@@ -81,7 +81,7 @@ export class PokemonService {
             }),
             mergeMap((url) => {
                 return this.httpClient.get<PokemonDto>(url).pipe(
-                    delay((new Date().getMilliseconds() % 7)*1000), // To simulate network latency
+                    delay((new Date().getMilliseconds() % 7) * 1000), // To simulate network latency
                     map(pokemonDto => this.DtoToModel(pokemonDto)),
                     retry(this.retryNumber),
                     catchError(() => of<PokemonErrorModel>({ errorMessage: 'An error occurred', failed: true }))
